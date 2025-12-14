@@ -1,971 +1,151 @@
--- Cracked by twistzz 
---// ANTI-WALKSPEED AND ANTI-JUMPPOWER
-for i,b in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
-    if b.Name == " " then
-    b:Destroy()
-end
-end
-
-for i,lc2 in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
-    if lc2:IsA("LocalScript") and string.match(lc2.Name, "1") or string.match(lc2.Name, "2") or string.match(lc2.Name, "3") or string.match(lc2.Name, "4") or string.match(lc2.Name, "5") or string.match(lc2.Name, "6") or string.match(lc2.Name, "7") or string.match(lc2.Name, "8") or string.match(lc2.Name, "9") then
-       lc2:Destroy()
-    end
-end
-
-for i,lc in pairs(game.Players.LocalPlayer.PlayerGui.Start:GetChildren()) do
-    if lc:IsA("LocalScript") and string.match(lc.Name, "1") or string.match(lc.Name, "2") or string.match(lc.Name, "3") or string.match(lc.Name, "4") or string.match(lc.Name, "5") or string.match(lc.Name, "6") or string.match(lc.Name, "7") or string.match(lc.Name, "8") or string.match(lc.Name, "9") then
-       lc:Destroy()
-    end
-end
-
-for i,c in pairs(game.Players.LocalPlayer.PlayerGui.Start:GetChildren()) do
-    if c.Name == "CheckPlayerW" then
-    c:Destroy()
-end
-end
-
-for i,z in pairs(game.StarterGui.Start:GetChildren()) do
-    if z.Name == "CheckPlayerW" then
-    z:Destroy()
-end
-end
-
-for _, v in pairs(game.StarterPlayer.StarterCharacterScripts:GetDescendants()) do
-if v.Name == " " then
-v:Destroy()
-end
-end
-
-game.Players.LocalPlayer.CharacterAdded:Connect(function()
-wait(0.5)
-for i,char in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
-    if char.Name == " " then
-       char:Destroy()
-    end
-    end
-end)
---//
-
---// ANTI-LAG (REMOVES LAG FROM GUI)
-for i,nolag in pairs(game.StarterGui.Start:GetChildren()) do
-if nolag.Name == "Gradient" then
-nolag:Destroy()
-end
-end
-for i,nolaglp in pairs(game.Players.LocalPlayer.PlayerGui.Start:GetChildren()) do
-if nolaglp.Name == "Gradient" then
-nolaglp:Destroy()
-end
-end
---//
-
-local RS
-local LeftLeg
-local RightLeg
-local LeftFoot
-local RightFoot
-local Distance = 0
-local DistanceTackle = 0
-local DistanceReach = 0
-local DistancePass = 0
-local DistanceWalk = 0
-local DistanceSide = 0
-local DistanceJump = 0
-local SaveDelay = 0
-local Heartbeat
-local HumanoidDied
-local TouchedBallLoop
-local RunStepped2
-local RunStepBall
-local AddBallA
-local TouchedGKBallBox
-
-local Player = game.Players.LocalPlayer
-local RootPart = Player.Character.HumanoidRootPart
-
-local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
-
-local Window = Fluent:CreateWindow({
-    Title = "J Hub",
-    SubTitle = "by Jack",
-    TabWidth = 160,
-    Size = UDim2.fromOffset(580, 460),
-    Acrylic = true, -- The blur may be detectable, setting this to false disables blur entirely
-    Theme = "Dark",
-    MinimizeKey = Enum.KeyCode.U -- Used when theres no MinimizeKeybind
-})
-
-local Tabs = {
-    Info = Window:AddTab({ Title = "Info", Icon = "info" }),
-    AntiKB = Window:AddTab({ Title = "Anti-Cheat Bypasser", Icon = "shield" }),
-    Reach = Window:AddTab({ Title = "Reach", Icon = "square-code" }),
-    React = Window:AddTab({ Title = "React", Icon = "zap" }),
-    GK = Window:AddTab({ Title = "GK", Icon = "zap" }),
-    BallMods = Window:AddTab({ Title = "Ball Mods", Icon = "volleyball" }),
-    Misc = Window:AddTab({ Title = "Misc", Icon = "layers" }),
-    PingLevel = Window:AddTab({ Title = "Ping and Level", Icon = "zap" })
-}
-
-Tabs.Info:AddParagraph({
-Title = "Info",
-Content = "This the Paid Version of Turbo's TPS: Street Soccer Script.\nMake Sure to enable Anti-Cheat Bypasser before using this script!"
-})
-
-    Tabs.AntiKB:AddButton({
-        Title = "Anti-Cheat Bypasser",
-        Description = "Prevents you from getting Banned.",
-        Callback = function()
-            Window:Dialog({
-                Title = "Anti-Cheat Bypasser",
-                Content = "Do you want to enable Anti-Cheat Bypasser?",
-                Buttons = {
-                    {
-                        Title = "Confirm",
-                        Callback = function()
-                            loadstring(game:HttpGet("https://freenote.biz/raw/vyzuuBLBkX"))()
-                        end
-                    },
-                    {
-                        Title = "Cancel",
-                        Callback = function()
-
-                        end
-                    }
-                }
-            })
-        end
-    })
-
-    Tabs.Reach:AddParagraph({
-        Title = "Reach (LEG)",
-        Content = "Reach is now for the Leg"
-    })
-
---// Services
-local UserInputService = game:GetService("UserInputService")
-local RunService = game:GetService("RunService")
+--// SERVICES
 local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 local Lighting = game:GetService("Lighting")
 
---// Configuration
-local REACH_X = 0 -- How far the reach extends left and right.
-local REACH_Y = 0  -- How far the reach extends up and down.
-local REACH_Z = 0 -- How far the reach extends forward and backward.
+local LocalPlayer = Players.LocalPlayer
 
---// State Variables
-local reachConnection
-local isIndicatorVisible = true -- Start with the indicator visible
+--// WIND UI
+local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Footagesus/WindUI/main/source.lua"))()
 
---// Create and set up the reach indicator part
-local reachIndicator = Instance.new("Part")
-reachIndicator.Name = "PlayerReachIndicator"
-reachIndicator.Shape = Enum.PartType.Block
-reachIndicator.Size = Vector3.new(REACH_X * 2, REACH_Y * 2, REACH_Z * 2)
-reachIndicator.Color = Color3.fromRGB(0, 255, 255) -- Cyan
-reachIndicator.Material = Enum.Material.Neon
-reachIndicator.Transparency = 1 -- Start invisible
-reachIndicator.Anchored = true
-reachIndicator.CanCollide = false
-reachIndicator.Parent = workspace
+local Window = WindUI:CreateWindow({
+    Title = "Reach Hub",
+    Icon = "rbxassetid://4483345998",
+    Author = "Converted",
+    Folder = "ReachHub",
+    Size = UDim2.fromOffset(520, 420),
+    Theme = "Dark"
+})
 
-local function onRenderStepped()
-    local player = Players.LocalPlayer
-    local character = player.Character
-    if not (character and character.Parent) then return end
+local ReachTab = Window:CreateTab("Reach", "square")
 
-    local humanoid = character:FindFirstChildOfClass("Humanoid")
-    local rootPart = character:FindFirstChild("HumanoidRootPart")
-    if not (humanoid and rootPart and humanoid.Health > 0) then return end
-
-    local ball = workspace.TPSSystem:FindFirstChild("TPS")
-    if not ball then return end
-
-    -- Update indicator
-    reachIndicator.CFrame = rootPart.CFrame
-    reachIndicator.Transparency = isIndicatorVisible and 0.75 or 1
-
-    -- Determine active leg
-    local activeLegPart
-    local preferredFoot = Lighting:FindFirstChild(player.Name) and Lighting[player.Name]:FindFirstChild("PreferredFoot")
-    if humanoid.RigType == Enum.HumanoidRigType.R6 then
-        if preferredFoot then
-            activeLegPart = (preferredFoot.Value == 1)
-                and character:FindFirstChild("Right Leg")
-                or character:FindFirstChild("Left Leg")
-        end
-    elseif humanoid.RigType == Enum.HumanoidRigType.R15 then
-        if preferredFoot then
-            activeLegPart = (preferredFoot.Value == 1)
-                and character:FindFirstChild("RightLowerLeg")
-                or character:FindFirstChild("LeftLowerLeg")
-        end
-    end
-
-    -- Normal reach
-    local delta = rootPart.Position - ball.Position
-    if activeLegPart and
-        math.abs(delta.X) <= REACH_X and
-        math.abs(delta.Y) <= REACH_Y and
-        math.abs(delta.Z) <= REACH_Z then
-
-        firetouchinterest(activeLegPart, ball, 0)
-        firetouchinterest(activeLegPart, ball, 1)
-    end
-
-    -- <<< SMOOTH TAKİP (yürür gibi topa yaklaşma) >>>
-    local distance = (rootPart.Position - ball.Position).Magnitude
-
-    if distance <= 3.0441 and distance > 3 then
-        local targetPos = ball.Position + Vector3.new(0, 3, 0)
-        local smoothSpeed = 0.0843
-        rootPart.CFrame = rootPart.CFrame:Lerp(CFrame.new(targetPos), smoothSpeed)
-    end
-end
-
-
-
-
-
-
-
-
-    local Toggle = Tabs.Reach:AddToggle("MyToggle", {Title = "Enable Leg Reach", Default = false })
-
-    Toggle:OnChanged(function(arg)
-if arg then
-reachConnection = RunService.RenderStepped:Connect(onRenderStepped) 
-else
-  if reachConnection then
-            reachConnection:Disconnect()
-            reachConnection = nil
-            reachIndicator.Transparency = 1  
-end
-end
-end)
-
-    local Toggle = Tabs.Reach:AddToggle("MyToggle", {Title = "Enable/Disable Reach Indicator", Default = true })
-
-    Toggle:OnChanged(function(arg)
-isIndicatorVisible = arg 
-end)
-
-        local Slider = Tabs.Reach:AddSlider("Slider", {
-        Title = "Sync Reach (X Y Z)",
-        Description = "Adjusts the X, Y, and Z reach distances all at once.",
-        Default = 0,
-        Min = 0,
-        Max = 50,
-        Rounding = 0.1,
-        Callback = function(Value)
-            REACH_X, REACH_Y, REACH_Z = Value, Value, Value
-            reachIndicator.Size = Vector3.new(REACH_X * 2, REACH_Y * 2, REACH_Z * 2)
-        end
-    })
-
-    Tabs.Reach:AddParagraph({
-        Title = "Reach (BALL)",
-        Content = "Reach is now for the Ball"
-    })
-
---// Services
-local b2b_UserInputService = game:GetService("UserInputService")
-local b2b_RunService = game:GetService("RunService")
-local b2b_Players = game:GetService("Players")
-
---// Configuration
-local b2b_REACH_X = 0 -- How far the reach extends left and right.
-local b2b_REACH_Y = 0  -- How far the reach extends up and down.
-local b2b_REACH_Z = 0 -- How far the reach extends forward and backward. 
-
-local b2b_reachConnection
-local b2b_isIndicatorVisible = true
-
---// Create and set up the reach indicator part
-local b2b_reachIndicator = Instance.new("Part")
-b2b_reachIndicator.Name = "BallToBodyReachIndicator"
-b2b_reachIndicator.Shape = Enum.PartType.Block
-b2b_reachIndicator.Size = Vector3.new(b2b_REACH_X * 2, b2b_REACH_Y * 2, b2b_REACH_Z * 2)
-b2b_reachIndicator.Color = Color3.fromRGB(255, 0, 0) -- Cyan
-b2b_reachIndicator.Material = Enum.Material.Neon
-b2b_reachIndicator.Transparency = 0.75
-b2b_reachIndicator.Anchored = true
-b2b_reachIndicator.CanCollide = false
-b2b_reachIndicator.Parent = workspace
-
---// Main reach logic wrapped in a function
-local function b2b_onRenderStepped()
-    local b2b_player = b2b_Players.LocalPlayer
-    local b2b_character = b2b_player.Character
-
-    -- Safety checks
-    if not (b2b_character and b2b_character.Parent) then return end
-    local b2b_humanoid = b2b_character:FindFirstChildOfClass("Humanoid")
-    local b2b_rootPart = b2b_character:FindFirstChild("HumanoidRootPart")
-    if not (b2b_humanoid and b2b_rootPart and b2b_humanoid.Health > 0) then return end
-
-    local b2b_ball = workspace.TPSSystem:FindFirstChild("TPS")
-    if not b2b_ball then return end
-
-    -- << THE FIX: Indicator follows the ball's position, but not its rotation. >>
-    b2b_reachIndicator.CFrame = CFrame.new(b2b_ball.Position)
-
-    -- Update indicator visibility based on the toggle state
-    b2b_reachIndicator.Transparency = b2b_isIndicatorVisible and 0.75 or 1
-
-    -- Check X, Y, and Z distances separately
-    local b2b_delta = b2b_rootPart.Position - b2b_ball.Position
-    if  math.abs(b2b_delta.X) <= b2b_REACH_X and 
-        math.abs(b2b_delta.Y) <= b2b_REACH_Y and 
-        math.abs(b2b_delta.Z) <= b2b_REACH_Z then
-
-        firetouchinterest(b2b_ball, b2b_rootPart, 0)
-        firetouchinterest(b2b_ball, b2b_rootPart, 1)
-    end
-end
-
-    local Toggle = Tabs.Reach:AddToggle("MyToggle", {Title = "Enable Ball Reach", Default = false })
-
-    Toggle:OnChanged(function(arg)
-if arg then
-b2b_reachConnection = b2b_RunService.RenderStepped:Connect(b2b_onRenderStepped) 
-else
-  if b2b_reachConnection then
-            b2b_reachConnection:Disconnect()
-            b2b_reachConnection = nil
-            b2b_reachIndicator.Transparency = 1  
-end
-end
-end)
-
-    local Toggle = Tabs.Reach:AddToggle("MyToggle", {Title = "Enable/Disable Reach Indicator", Default = true })
-
-    Toggle:OnChanged(function(arg)
-b2b_isIndicatorVisible = arg 
-end)
-
-
-    local Slider = Tabs.Reach:AddSlider("Slider", {
-        Title = "Z Reach",
-        Description = "Adjusts the reach distance from front to back.",
-        Default = 0,
-        Min = 0,
-        Max = 50,
-        Rounding = 0.1,
-        Callback = function(Value)
-            b2b_REACH_Z = Value
-            b2b_reachIndicator.Size = Vector3.new(b2b_REACH_X * 2, b2b_REACH_Y * 2, b2b_REACH_Z * 2)
-        end
-    })
-
-        local Slider = Tabs.Reach:AddSlider("Slider", {
-        Title = "Sync Reach (X Y Z)",
-        Description = "Adjusts the X, Y, and Z reach distances all at once.",
-        Default = 0,
-        Min = 0,
-        Max = 50,
-        Rounding = 0.1,
-        Callback = function(Value)
-            b2b_REACH_X, b2b_REACH_Y, b2b_REACH_Z = Value, Value, Value
-            b2b_reachIndicator.Size = Vector3.new(b2b_REACH_X * 2, b2b_REACH_Y * 2, b2b_REACH_Z * 2)
-        end
-    })
-
-    Tabs.Reach:AddParagraph({
-        Title = "Reach (HEAD)",
-        Content = "Reach is now for the Head"
-    })
-
---// Services
-local h2b_UserInputService = game:GetService("UserInputService")
-local h2b_RunService = game:GetService("RunService")
-local h2b_Players = game:GetService("Players")
-
---// Configuration
-local h2b_REACH_X = 0 -- How far the reach extends left and right.
-local h2b_REACH_Y = 0  -- How far the reach extends up and down.
-local h2b_REACH_Z = 0 -- How far the reach extends forward and backward. 
-
-local h2b_reachConnection
-local h2b_isIndicatorVisible = true
-
---// Create and set up the reach indicator part
-local h2b_reachIndicator = Instance.new("Part")
-h2b_reachIndicator.Name = "HeadToBallReachIndicator"
-h2b_reachIndicator.Shape = Enum.PartType.Block
-h2b_reachIndicator.Size = Vector3.new(h2b_REACH_X * 2, h2b_REACH_Y * 2, h2b_REACH_Z * 2)
-h2b_reachIndicator.Color = Color3.fromRGB(128, 0, 128) -- Cyan
-h2b_reachIndicator.Material = Enum.Material.Neon
-h2b_reachIndicator.Transparency = 1 -- Start invisible
-h2b_reachIndicator.Anchored = true
-h2b_reachIndicator.CanCollide = false
-h2b_reachIndicator.Parent = workspace
-
---// Main reach logic wrapped in a function
-local function h2b_onRenderStepped()
-    local h2b_player = h2b_Players.LocalPlayer
-    local h2b_character = h2b_player.Character
-
-    -- Safety checks
-    if not (h2b_character and h2b_character.Parent) then return end
-    local h2b_humanoid = h2b_character:FindFirstChildOfClass("Humanoid")
-    local h2b_headPart = h2b_character:FindFirstChild("Head")
-    if not (h2b_humanoid and h2b_headPart and h2b_humanoid.Health > 0) then return end
-
-    local h2b_ball = workspace.TPSSystem:FindFirstChild("TPS")
-    if not h2b_ball then return end
-
-    -- << CHANGED: Indicator now follows the head, not the ball >>
-    h2b_reachIndicator.CFrame = h2b_headPart.CFrame
-
-    -- Update indicator visibility based on the toggle state
-    h2b_reachIndicator.Transparency = h2b_isIndicatorVisible and 0.75 or 1
-
-    -- Distance is calculated from the head to the ball
-    local h2b_delta = h2b_headPart.Position - h2b_ball.Position
-    if  math.abs(h2b_delta.X) <= h2b_REACH_X and 
-        math.abs(h2b_delta.Y) <= h2b_REACH_Y and 
-        math.abs(h2b_delta.Z) <= h2b_REACH_Z then
-
-        -- << CHANGED: The head now touches the ball >>
-        firetouchinterest(h2b_headPart, h2b_ball, 0)
-        firetouchinterest(h2b_headPart, h2b_ball, 1)
-    end
-end
-
---// GUI Elements
-local EnableToggle = Tabs.Reach:AddToggle("EnableToggle", {Title = "Enable Head Reach", Default = false })
-EnableToggle:OnChanged(function(arg)
-    if arg then
-        h2b_reachConnection = h2b_RunService.RenderStepped:Connect(h2b_onRenderStepped) 
+--// ================== COMMON ==================
+local function GetLeg(char, hum, foot)
+    if hum.RigType == Enum.HumanoidRigType.R6 then
+        return foot == 1 and char:FindFirstChild("Right Leg") or char:FindFirstChild("Left Leg")
     else
-        if h2b_reachConnection then
-            h2b_reachConnection:Disconnect()
-            h2b_reachConnection = nil
-            h2b_reachIndicator.Transparency = 1  
-        end
+        return foot == 1 and char:FindFirstChild("RightLowerLeg") or char:FindFirstChild("LeftLowerLeg")
     end
-end)
+end
 
-local IndicatorToggle = Tabs.Reach:AddToggle("IndicatorToggle", {Title = "Enable/Disable Reach Indicator", Default = true })
-IndicatorToggle:OnChanged(function(arg)
-    h2b_isIndicatorVisible = arg 
-end)
+local function GetBall()
+    local sys = workspace:FindFirstChild("TPSSystem")
+    return sys and sys:FindFirstChild("TPS")
+end
 
-local Sync_Slider = Tabs.Reach:AddSlider("Sync_Slider", {
-    Title = "Sync Reach (X Y Z)", Description = "Adjusts the X, Y, and Z reach distances all at once.",
-    Default = 0, Min = 0, Max = 50, Rounding = 0.1,
-    Callback = function(Value)
-        h2b_REACH_X, h2b_REACH_Y, h2b_REACH_Z = Value, Value, Value
-        h2b_reachIndicator.Size = Vector3.new(h2b_REACH_X * 2, h2b_REACH_Y * 2, h2b_REACH_Z * 2)
+--// ================== LEG REACH ==================
+local LEG_REACH = 3
+local LegConn
+
+ReachTab:CreateToggle({
+    Name = "Enable Leg Reach",
+    Callback = function(state)
+        if state then
+            LegConn = RunService.RenderStepped:Connect(function()
+                local char = LocalPlayer.Character
+                if not char then return end
+
+                local hum = char:FindFirstChildOfClass("Humanoid")
+                local hrp = char:FindFirstChild("HumanoidRootPart")
+                if not hum or not hrp then return end
+
+                local ball = GetBall()
+                if not ball then return end
+
+                local lf = Lighting:FindFirstChild(LocalPlayer.Name)
+                local pf = lf and lf:FindFirstChild("PreferredFoot")
+                if not pf then return end
+
+                local leg = GetLeg(char, hum, pf.Value)
+                if not leg then return end
+
+                if (hrp.Position - ball.Position).Magnitude <= LEG_REACH then
+                    firetouchinterest(leg, ball, 0)
+                    firetouchinterest(leg, ball, 1)
+                end
+            end)
+        else
+            if LegConn then LegConn:Disconnect() LegConn = nil end
+        end
     end
 })
 
-    local Toggle = Tabs.React:AddToggle("MyToggle", {Title = "Better React", Default = false })
-
-    Toggle:OnChanged(function(arg)
-if arg then
-RunStepped2 = game:GetService("RunService").RenderStepped:Connect(function()
-if game.Players.LocalPlayer.Character.Humanoid.RigType == Enum.HumanoidRigType.R6 then
-if (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - game.Workspace.TPSSystem.TPS.Position).Magnitude <= 3.07 then
-if game.Lighting[game.Players.LocalPlayer.Name].PreferredFoot.Value == 1 then
-firetouchinterest(game.Players.LocalPlayer.Character["Right Leg"],game.Workspace.TPSSystem.TPS,0)
-            firetouchinterest(game.Players.LocalPlayer.Character["Right Leg"],game.Workspace.TPSSystem.TPS,1)
-elseif game.Lighting[game.Players.LocalPlayer.Name].PreferredFoot.Value == 2 then
-firetouchinterest(game.Players.LocalPlayer.Character["Left Leg"],game.Workspace.TPSSystem.TPS,0)
-            firetouchinterest(game.Players.LocalPlayer.Character["Left Leg"],game.Workspace.TPSSystem.TPS,1)
-
-end
-end
-end
-if game.Players.LocalPlayer.Character.Humanoid.RigType == Enum.HumanoidRigType.R15 then
-if (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - game.Workspace.TPSSystem.TPS.Position).Magnitude <= 3 then
-if game.Lighting[game.Players.LocalPlayer.Name].PreferredFoot.Value == 1 then
-firetouchinterest(game.Players.LocalPlayer.Character["RightLowerLeg"], game.Workspace.TPSSystem.TPS, 0)
-            firetouchinterest(game.Players.LocalPlayer.Character["RightLowerLeg"], game.Workspace.TPSSystem.TPS, 1)
-elseif game.Lighting[game.Players.LocalPlayer.Name].PreferredFoot.Value == 2 then
-firetouchinterest(game.Players.LocalPlayer.Character["LeftLowerLeg"], game.Workspace.TPSSystem.TPS, 0)
-            firetouchinterest(game.Players.LocalPlayer.Character["LeftLowerLeg"], game.Workspace.TPSSystem.TPS, 1)
-
-end
-end
-end
-end)
-else
-if RunStepped2 then
-RunStepped2:Disconnect()
-end
-end
-    end)
-
-    Tabs.React:AddParagraph({
-        Title = "Replication Lag-Ping",
-        Content = "Use 0.02 - 0.07 For Tricks and Insane React"
-    })
-
- local Input = Tabs.React:AddInput("Input", {
-        Title = "Replication Lag-Ping",
-        Default = "0",
-        Placeholder = "Placeholder",
-        Numeric = true, -- Only allows numbers
-        Finished = true, -- Only calls callback when you press enter
-        Callback = function(Value)
-            settings():GetService("NetworkSettings").IncomingReplicationLag = tonumber(Value)
-        end
-    })
-
-    Tabs.React:AddButton({
-        Title = "React GUI",
-        Description = "More React features",
-        Callback = function()
-            Window:Dialog({
-                Title = "React GUI",
-                Content = "Are you sure to enable React GUI?",
-                Buttons = {
-                    {
-                        Title = "Confirm",
-                        Callback = function()
-                            loadstring(game:HttpGet("https://raw.githubusercontent.com/cnd00idjehdil1dhw8w9wowjeie9r00ro9djfjx/xiodidhd9dodjdifijdidodo/main/Rt"))()
-                        end
-                    },
-                    {
-                        Title = "Cancel",
-                        Callback = function()
-
-                        end
-                    }
-                }
-            })
-        end
-    })
-
-    local Toggle = Tabs.BallMods:AddToggle("MyToggle", {Title = "Ball Collission", Default = false })
-
-    Toggle:OnChanged(function(arg)
-        if arg then game.Workspace.TPSSystem.TPS.CanCollide = true else
-        game.Workspace.TPSSystem.TPS.CanCollide = false 
-        end
-    end)
-
-    local Toggle = Tabs.BallMods:AddToggle("MyToggle", {Title = "Spectate Ball", Default = false })
-
-    Toggle:OnChanged(function(arg)
-        if arg then game.Workspace.CurrentCamera.CameraSubject = game.Workspace.TPSSystem.TPS else
-        game.Workspace.CurrentCamera.CameraSubject = game.Players.LocalPlayer.Character 
-        end
-    end)
-
-    Tabs.BallMods:AddButton({
-        Title = "Remove Textures",
-        Description = "Removes the textures of the ball.",
-        Callback = function()
-            Window:Dialog({
-                Title = "Remove Textures",
-                Content = "Are you sure you want to remove the Ball Textures?",
-                Buttons = {
-                    {
-                        Title = "Confirm",
-                        Callback = function()
-                                     local Ball = game.Workspace.TPSSystem.TPS
-local Player = game.Players.LocalPlayer
-local HRP = Player.Character.HumanoidRootPart
-local RightLeg, LeftLeg = Player.Character["Right Leg"], Player.Character["Left Leg"]
-
-for i,BallCON in pairs(Ball:GetChildren()) do
-    if BallCON:IsA("Decal") or BallCON:IsA("Smoke") or BallCON:IsA("PointLight") or BallCON:IsA("ParticleEmitter") then
-       BallCON:Destroy()
+ReachTab:CreateSlider({
+    Name = "Leg Reach Distance",
+    Min = 1,
+    Max = 20,
+    Default = 3,
+    Callback = function(v)
+        LEG_REACH = v
     end
-end
+})
 
-for i,BALLFIRE in pairs(Ball:GetChildren()) do
-    if BALLFIRE:IsA("Fire") then
-       BALLFIRE.Heat = 1
-       BALLFIRE.Size = 5
-    end
-end
+--// ================== BALL REACH ==================
+local BALL_REACH = 5
+local BallConn
 
-Ball.Massless = true
-Ball.CustomPhysicalProperties = false
-                        end
-                    },
-                    {
-                        Title = "Cancel",
-                        Callback = function()
+ReachTab:CreateToggle({
+    Name = "Enable Ball Reach",
+    Callback = function(state)
+        if state then
+            BallConn = RunService.RenderStepped:Connect(function()
+                local char = LocalPlayer.Character
+                local hrp = char and char:FindFirstChild("HumanoidRootPart")
+                local ball = GetBall()
+                if not hrp or not ball then return end
 
-                        end
-                    }
-                }
-            })
-        end
-    })
-
-local Toggle = Tabs.GK:AddToggle("MyToggle", {Title = "Auto Save [Touch Method]", Default = false })
-
-    Toggle:OnChanged(function(arg)
-if arg then
-TouchedGKBallBox = game.Workspace.TPSSystem.TPS.Touched:Connect(function(HRP)
-    if HRP == game.Players.LocalPlayer.Character.HumanoidRootPart then
-        for i,v in pairs(game.Workspace:GetDescendants()) do
-    if v.Name == "TPS" and v:IsA("Part") then
-    if game.Players.LocalPlayer.Character.Humanoid.RigType == Enum.HumanoidRigType.R6 then
-    AnimationId = "304581045"
-local Anim = Instance.new("Animation")
-Anim.AnimationId = "rbxassetid://"..AnimationId
-local k = game.Players.LocalPlayer.Character.Humanoid:LoadAnimation(Anim)
-k:Play()
-wait(SaveDelay)
-
-local A_1 = game:GetService("Workspace").TPSSystem.TPS
-local A_2 = game.Players.LocalPlayer.Character["Right Leg"]
-local Event = game:GetService("Workspace").FE.Actions.SaveRL
-Event:FireServer(A_1, A_2)
-
-local Events2 = game:GetService("Workspace").FE.Kick.RemoteEvent2
-Events2:FireServer()
-else
-AnimationId = "3008336125"
-local Anim = Instance.new("Animation")
-Anim.AnimationId = "rbxassetid://"..AnimationId
-local k = game.Players.LocalPlayer.Character.Humanoid:LoadAnimation(Anim)
-k:Play()
-wait(SaveDelay)
-
-local A_1 = game:GetService("Workspace").TPSSystem.TPS
-local A_2 = game.Players.LocalPlayer.Character["HumanoidRootPart"]
-local Event = game:GetService("Workspace").FE.Actions.SaveT
-Event:FireServer(A_1, A_2)
-
-local Events3 = game:GetService("Workspace").FE.Kick.RemoteEvent2
-Events3:FireServer()
-end
-end
-end
-end
-end)
-    else
-if TouchedGKBallBox then
-TouchedGKBallBox:Disconnect()
-end
-end
-    end)
-
-    local Toggle = Tabs.GK:AddToggle("MyToggle", {Title = "Auto Save [RemoteEvent Method]", Default = false })
-
-    Toggle:OnChanged(function(arg)
-if arg then
-_G.GKS = true
-    while _G.GKS do
-    wait()
-       for i,v in pairs(game.Workspace:GetDescendants()) do
-    if v.Name == "TPS" and v:IsA("Part") then
-    if (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - v.Position).Magnitude <= Distance then
-    if game.Players.LocalPlayer.Character.Humanoid.RigType == Enum.HumanoidRigType.R6 then
-    AnimationId = "304581045"
-local Anim = Instance.new("Animation")
-Anim.AnimationId = "rbxassetid://"..AnimationId
-local k = game.Players.LocalPlayer.Character.Humanoid:LoadAnimation(Anim)
-k:Play()
-wait(SaveDelay)
-
-local A_1 = game:GetService("Workspace").TPSSystem.TPS
-local A_2 = game.Players.LocalPlayer.Character["Right Leg"]
-local Event = game:GetService("Workspace").FE.Actions.SaveRL
-Event:FireServer(A_1, A_2)
-
-local Events2 = game:GetService("Workspace").FE.Kick.RemoteEvent2
-Events2:FireServer()
-else
-AnimationId = "3008336125"
-local Anim = Instance.new("Animation")
-Anim.AnimationId = "rbxassetid://"..AnimationId
-local k = game.Players.LocalPlayer.Character.Humanoid:LoadAnimation(Anim)
-k:Play()
-wait(SaveDelay)
-
-local A_1 = game:GetService("Workspace").TPSSystem.TPS
-local A_2 = game.Players.LocalPlayer.Character["HumanoidRootPart"]
-local Event = game:GetService("Workspace").FE.Actions.SaveT
-Event:FireServer(A_1, A_2)
-
-local Events3 = game:GetService("Workspace").FE.Kick.RemoteEvent2
-Events3:FireServer()
-end
-end
-end
-end
-end
-    else
-if _G.GKS == true then
-_G.GKS = false
-else
-_G.GKS = true
-end
-end
-    end)
-
-    Tabs.Misc:AddButton({
-        Title = "Admin",
-        Description = "Gives you Admin (Don't use features like Fly)",
-        Callback = function()
-            Window:Dialog({
-                Title = "Admin",
-                Content = "Are you sure to enable admin?",
-                Buttons = {
-                    {
-                        Title = "Confirm",
-                        Callback = function()
-                            loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
-                        end
-                    },
-                    {
-                        Title = "Cancel",
-                        Callback = function()
-
-                        end
-                    }
-                }
-            })
-        end
-    })
-
-    local Toggle = Tabs.Misc:AddToggle("MyToggle", {Title = "Faster Cooldown", Default = false })
-
-    Toggle:OnChanged(function(arg)
-        if arg then game:GetService("Players").LocalPlayer.PlayerGui.Start.GamePassMenu.Items.Cooldown.Tick.Visible = true
-    game:GetService("Players").LocalPlayer.PlayerGui.Start.GamePassMenu.Items.Cooldown.Cooldown.Style = "RobloxRoundButton"
-        game:GetService("Players").LocalPlayer.PlayerGui.Start.PowerShot.PowerValue.Value = 30 else
-            game:GetService("Players").LocalPlayer.PlayerGui.Start.GamePassMenu.Items.Cooldown.Cooldown.Style = "RobloxRoundDefaultButton"
-    game:GetService("Players").LocalPlayer.PlayerGui.Start.GamePassMenu.Items.Cooldown.Tick.Visible = false
-       game:GetService("Players").LocalPlayer.PlayerGui.Start.PowerShot.PowerValue.Value = 60
-        end
-    end)
-
-    local Toggle = Tabs.Misc:AddToggle("MyToggle", {Title = "Blue Flame", Default = false })
-
-    Toggle:OnChanged(function(arg)
-if arg then
-game:GetService("Players").LocalPlayer.PlayerGui.Start.GamePassMenu.Items.BlueFlame.Tick.Visible = true
-    game:GetService("Players").LocalPlayer.PlayerGui.Start.GamePassMenu.Items.BlueFlame.BlueFlame.Style = "RobloxRoundButton"
-        game:GetService("Players").LocalPlayer.PlayerGui.Start.PowerShot.Image = "rbxassetid://5366457711"
-        game:GetService("Players").LocalPlayer.Backpack.FValue.Value = 2
-    else
-        game:GetService("Players").LocalPlayer.PlayerGui.Start.GamePassMenu.Items.BlueFlame.Tick.Visible = false
-    game:GetService("Players").LocalPlayer.PlayerGui.Start.GamePassMenu.Items.BlueFlame.BlueFlame.Style = "RobloxRoundButton"
-        game:GetService("Players").LocalPlayer.PlayerGui.Start.PowerShot.Image = "rbxassetid://5366457711"
-       game:GetService("Players").LocalPlayer.Backpack.FValue.Value = 1
-    end
-    end)
-
-   local Slider = Tabs.Misc:AddSlider("Slider", {
-        Title = "Change FOV",
-        Description = "Change your FOV",
-        Default = 90,
-        Min = 60,
-        Max = 120,
-        Rounding = 0.1,
-        Callback = function(arg)
-            game.Workspace.CurrentCamera.FieldOfView = arg
-        end
-    })
-
-    Tabs.Misc:AddButton({
-        Title = "Unlock Celebrations",
-        Description = "Unlocks every Celebration Pack.",
-        Callback = function()
-            Window:Dialog({
-                Title = "Unlock Celebrations",
-                Content = "Are you sure you want to unlock Celebrations?",
-                Buttons = {
-                    {
-                        Title = "Confirm",
-                        Callback = function()
-                                game:GetService("Players").LocalPlayer.PlayerGui.Start.GamePassMenu.Items.CelebrationPack1.Tick.Visible = true
-    game:GetService("Players").LocalPlayer.PlayerGui.Start.GamePassMenu.Items.CelebrationPack1.CelebrationPack1.Style = "RobloxRoundButton"
-        game:GetService("Players").LocalPlayer.PlayerGui.Start.GamePassMenu.Items.CelebrationPack2.Tick.Visible = true
-    game:GetService("Players").LocalPlayer.PlayerGui.Start.GamePassMenu.Items.CelebrationPack2.CelebrationPack2.Style = "RobloxRoundButton"
-        game:GetService("Players").LocalPlayer.PlayerGui.Start.GamePassMenu.Items.CelebrationPack3.Tick.Visible = true
-    game:GetService("Players").LocalPlayer.PlayerGui.Start.GamePassMenu.Items.CelebrationPack3.CelebrationPack3.Style = "RobloxRoundButton"
-        game:GetService("Players").LocalPlayer.PlayerGui.Start.GamePassMenu.Items.CelebrationPack4.Tick.Visible = true
-    game:GetService("Players").LocalPlayer.PlayerGui.Start.GamePassMenu.Items.CelebrationPack4.CelebrationPack4.Style = "RobloxRoundButton"
-        game:GetService("Players").LocalPlayer.PlayerGui.Start.GamePassMenu.Items.CelebrationPack5.Tick.Visible = true
-    game:GetService("Players").LocalPlayer.PlayerGui.Start.GamePassMenu.Items.CelebrationPack5.CelebrationPack5.Style = "RobloxRoundButton"
-
-    game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.Package1.Button.Visible = false
-game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.Package2.Button.Visible = false
-game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.Package3.Button.Visible = false
-game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.Package4.Button.Visible = false
-game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.Package5.Button.Visible = false
-
-    game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF04.Active = true
-   game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF04.Selectable = true
-    game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF04.Script.Disabled = false
-    game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF05.Active = true
-    game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF05.Selectable = true
-    game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF05.Script.Disabled = false
-   game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF06.Active = true
-    game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF06.Selectable = true
-    game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF06.Script.Disabled = false
-
-game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF07.Active = true
-   game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF07.Selectable = true
-    game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF07.Script.Disabled = false
-    game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF08.Active = true
-    game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF08.Selectable = true
-    game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF08.Script.Disabled = false
-   game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF09.Active = true
-    game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF09.Selectable = true
-    game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF09.Script.Disabled = false
-
-game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF10.Active = true
-   game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF10.Selectable = true
-    game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF10.Script.Disabled = false
-    game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF11.Active = true
-    game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF11.Selectable = true
-    game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF11.Script.Disabled = false
-   game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF12.Active = true
-    game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF12.Selectable = true
-    game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF12.Script.Disabled = false
-
-game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF13.Active = true
-   game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF13.Selectable = true
-    game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF13.Script.Disabled = false
-    game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF14.Active = true
-    game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF14.Selectable = true
-    game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF14.Script.Disabled = false
-   game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF15.Active = true
-    game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF15.Selectable = true
-    game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF15.Script.Disabled = false
-
-game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF16.Active = true
-   game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF16.Selectable = true
-    game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF16.Script.Disabled = false
-    game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF17.Active = true
-    game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF17.Selectable = true
-    game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF17.Script.Disabled = false
-   game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF18.Active = true
-    game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF18.Selectable = true
-    game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF18.Script.Disabled = false
-
-
-    game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF04.MouseButton1Click:Connect(function()
-    require(game.Players.LocalPlayer.Backpack.CelebrationsModule).Celebration4()
-end)
-
-game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF05.MouseButton1Click:Connect(function()
-    require(game.Players.LocalPlayer.Backpack.CelebrationsModule).Celebration5()
-end)
-
-game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF06.MouseButton1Click:Connect(function()
-    require(game.Players.LocalPlayer.Backpack.CelebrationsModule).Celebration6()
-end)
-
-
-game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF07.MouseButton1Click:Connect(function()
-    require(game.Players.LocalPlayer.Backpack.CelebrationsModule).Celebration7()
-end)
-
-
-game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF08.MouseButton1Click:Connect(function()
-    require(game.Players.LocalPlayer.Backpack.CelebrationsModule).Celebration8()
-end)
-
-
-game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF09.MouseButton1Click:Connect(function()
-    require(game.Players.LocalPlayer.Backpack.CelebrationsModule).Celebration9()
-end)
-
-
-game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF10.MouseButton1Click:Connect(function()
-    require(game.Players.LocalPlayer.Backpack.CelebrationsModule).Celebration10()
-end)
-
-
-game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF11.MouseButton1Click:Connect(function()
-    require(game.Players.LocalPlayer.Backpack.CelebrationsModule).Celebration11()
-end)
-
-
-game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF12.MouseButton1Click:Connect(function()
-    require(game.Players.LocalPlayer.Backpack.CelebrationsModule).Celebration12()
-end)
-
-
-game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF13.MouseButton1Click:Connect(function()
-    require(game.Players.LocalPlayer.Backpack.CelebrationsModule).Celebration13()
-end)
-
-
-game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF14.MouseButton1Click:Connect(function()
-    require(game.Players.LocalPlayer.Backpack.CelebrationsModule).Celebration14()
-end)
-
-
-game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF15.MouseButton1Click:Connect(function()
-    require(game.Players.LocalPlayer.Backpack.CelebrationsModule).Celebration15()
-end)
-
-
-game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF16.MouseButton1Click:Connect(function()
-    require(game.Players.LocalPlayer.Backpack.CelebrationsModule).Celebration16()
-end)
-
-
-game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF17.MouseButton1Click:Connect(function()
-    require(game.Players.LocalPlayer.Backpack.CelebrationsModule).Celebration17()
-end)
-
-
-game:GetService("Players").LocalPlayer.PlayerGui.Start.Celebrations.CelebrationsSelect.SF18.MouseButton1Click:Connect(function()
-    require(game.Players.LocalPlayer.Backpack.CelebrationsModule).Celebration18()
-end)
-                        end
-                    },
-                    {
-                        Title = "Cancel",
-                        Callback = function()
-
-                        end
-                    }
-                }
-            })
-        end
-    })
-
-    Tabs.PingLevel:AddParagraph({
-        Title = "Ping and Level Changer",
-        Content = "⚠️ only use numbers from 0.01 - 0.10 for the Ping Changer"
-    })
-
- local Input = Tabs.PingLevel:AddInput("Input", {
-        Title = "Ping Changer",
-        Default = "0",
-        Placeholder = "Placeholder",
-        Numeric = true, -- Only allows numbers
-        Finished = true, -- Only calls callback when you press enter
-        Callback = function(Value)
-            settings():GetService("NetworkSettings").IncomingReplicationLag = tonumber(Value)
-        end
-    })
-
- local Input = Tabs.PingLevel:AddInput("Input", {
-        Title = "Level Changer",
-        Default = "0",
-        Placeholder = "Placeholder",
-        Numeric = true, -- Only allows numbers
-        Finished = true, -- Only calls callback when you press enter
-        Callback = function(Value)
-            local Targets
-    Targets = tonumber(Value)
-    wait(0.1)
-    local mt = getrawmetatable(game);
-setreadonly(mt, false);
-local old_index = mt.__index;
-mt.__index = function(a, b)
-    if tostring(a) == "PPLevel" or tostring(a) == "Level" then
-        if tostring(b) == "Value" then
-            return Targets;
+                if (hrp.Position - ball.Position).Magnitude <= BALL_REACH then
+                    firetouchinterest(ball, hrp, 0)
+                    firetouchinterest(ball, hrp, 1)
+                end
+            end)
+        else
+            if BallConn then BallConn:Disconnect() BallConn = nil end
         end
     end
-    return old_index(a, b);
-end
+})
+
+ReachTab:CreateSlider({
+    Name = "Ball Reach Distance",
+    Min = 1,
+    Max = 20,
+    Default = 5,
+    Callback = function(v)
+        BALL_REACH = v
+    end
+})
+
+--// ================== HEAD REACH ==================
+local HEAD_REACH = 4
+local HeadConn
+
+ReachTab:CreateToggle({
+    Name = "Enable Head Reach",
+    Callback = function(state)
+        if state then
+            HeadConn = RunService.RenderStepped:Connect(function()
+                local char = LocalPlayer.Character
+                local head = char and char:FindFirstChild("Head")
+                local ball = GetBall()
+                if not head or not ball then return end
+
+                if (head.Position - ball.Position).Magnitude <= HEAD_REACH then
+                    firetouchinterest(head, ball, 0)
+                    firetouchinterest(head, ball, 1)
+                end
+            end)
+        else
+            if HeadConn then HeadConn:Disconnect() HeadConn = nil end
         end
-    })
+    end
+})
+
+ReachTab:CreateSlider({
+    Name = "Head Reach Distance",
+    Min = 1,
+    Max = 20,
+    Default = 4,
+    Callback = function(v)
+        HEAD_REACH = v
+    end
+})
