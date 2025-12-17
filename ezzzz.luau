@@ -176,10 +176,6 @@ end
 
 
 
-
-
-
-
     local Toggle = Tabs.Reach:AddToggle("MyToggle", {Title = "Enable Leg Reach", Default = false })
 
     Toggle:OnChanged(function(arg)
@@ -477,6 +473,20 @@ end
     end)
 
 
+    local Toggle = Tabs.Reach:AddToggle("MyToggle", {Title = "Enable Ball TP", Default = false })
+
+    Toggle:OnChanged(function(arg)
+if arg then
+            local distance = (rootPart.Position - ball.Position).Magnitude
+
+        if distance <= TELEPORT_EZ and distance > 3 then
+            local targetPos = ball.Position + Vector3.new(0, 3, 0)
+            local smoothSpeed = 0.0843
+            rootPart.CFrame = rootPart.CFrame:Lerp(CFrame.new(targetPos), smoothSpeed)
+        end
+end
+end)
+
         local Slider = Tabs.BallMods:AddSlider("Slider", {
         Title = "Teleport Distance",
         Description = "",
@@ -489,14 +499,6 @@ end
         end
     })
 
-
-    local distance = (rootPart.Position - ball.Position).Magnitude
-
-    if distance <= TELEPORT_EZ and distance > 3 then
-        local targetPos = ball.Position + Vector3.new(0, 3, 0)
-        local smoothSpeed = 0.0843
-        rootPart.CFrame = rootPart.CFrame:Lerp(CFrame.new(targetPos), smoothSpeed)
-    end
 
     local Toggle = Tabs.BallMods:AddToggle("MyToggle", {Title = "Spectate Ball", Default = false })
 
@@ -919,3 +921,4 @@ mt.__index = function(a, b)
 end
         end
     })
+
