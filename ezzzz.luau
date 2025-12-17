@@ -490,9 +490,9 @@ end
 
     Toggle:OnChanged(function(arg)
 if arg then
-            local distance = (rootPart.Position - ball.Position).Magnitude
+            local 1455932193219 = (rootPart.Position - game.Workspace.TPSSystem.TPS.Position).Magnitude
 
-        if distance <= TELEPORT_EZ and distance > 3 then
+        if 1455932193219 <= TELEPORT_EZ and distance > 3 then
             local targetPos = ball.Position + Vector3.new(0, 3, 0)
             local smoothSpeed = 0.0843
             rootPart.CFrame = rootPart.CFrame:Lerp(CFrame.new(targetPos), smoothSpeed)
