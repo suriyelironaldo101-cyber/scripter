@@ -472,8 +472,19 @@ end
         end
     end)
 
+        local Slider = Tabs.BallMods:AddSlider("Slider", {
+        Title = "Teleport Distance",
+        Description = "",
+        Default = 0,
+        Min = 0,
+        Max = 50,
+        Rounding = 0.1,
+        Callback = function(Value)
+            TELEPORT_EZ = Value
+        end
+    })
 
-    local Toggle = Tabs.Reach:AddToggle("MyToggle", {Title = "Enable Ball TP", Default = false })
+    local Toggle = Tabs.BallMods:AddToggle("MyToggle", {Title = "Enable Ball TP", Default = false })
 
     Toggle:OnChanged(function(arg)
 if arg then
@@ -486,18 +497,6 @@ if arg then
         end
 end
 end)
-
-        local Slider = Tabs.BallMods:AddSlider("Slider", {
-        Title = "Teleport Distance",
-        Description = "",
-        Default = 0,
-        Min = 0,
-        Max = 50,
-        Rounding = 0.1,
-        Callback = function(Value)
-            TELEPORT_EZ = Value
-        end
-    })
 
 
     local Toggle = Tabs.BallMods:AddToggle("MyToggle", {Title = "Spectate Ball", Default = false })
