@@ -82,7 +82,9 @@ local Player = game.Players.LocalPlayer
 local RootPart = Player.Character.HumanoidRootPart
 local part = game.Workspace.TPSSystem.TPS
 local PhysicsService = game:GetService("PhysicsService")
+print("BEFORE FLUENT")
 local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+print("AFTER FLUENT")
 
 local Window = Fluent:CreateWindow({
     Title = "Zeron",
